@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SackDrainers | Made By Nyn</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div id="loadingScreen">
+    <h1>SackDrainers</h1>
+    <p>Made By Nyn</p>
+</div>
+
+<header>
+
+<div class="logo">
+
+<h1>SackDrainers</h1>
+
+<span>Made By Nyn</span>
+
+</div>
+
+<div class="moneyBox">
+
+💰 $<span id="money">0</span>
+
+</div>
+
+</header>
+
+<nav>
+
+<button id="playBtn">Play</button>
+
+<button id="shopBtn">Shop</button>
+
+<button id="statsBtn">Stats</button>
+
+<button id="settingsBtn">Settings</button>
+
+</nav>
+
+<main>
+
+<section id="game">
+
+<div id="drainContainer">
+
+<div id="drain">
+
+🕳️
+
+</div>
+
+<div id="pump">
+
+🪠
+
+</div>
+
+</div>
+
+<h2 id="statusText">
+
+Ready To Pump
+
+</h2>
+
+<button id="pumpButton">
+
+PUMP DRAIN
+
+</button>
+
+</section>
+
+<section id="shop" class="hidden">
+
+<h2>Upgrade Shop</h2>
+
+<div class="upgrade">
+
+<h3>Better Plunger</h3>
+
+<p>+$1 Per Pump</p>
+
+<button id="upgrade1">
+
+Buy ($25)
+
+</button>
+
+</div>
+
+<div class="upgrade">
+
+<h3>Drain Vacuum</h3>
+
+<p>+$5 Per Pump</p>
+
+<button id="upgrade2">
+
+Buy ($100)
+
+</button>
+
+</div>
+
+<div class="upgrade">
+
+<h3>Electric Pump</h3>
+
+<p>+$20 Per Pump</p>
+
+<button id="upgrade3">
+
+Buy ($500)
+
+</button>
+
+</div>
+
+<div class="upgrade">
+
+<h3>Industrial Cleaner</h3>
+
+<p>Auto Pumps</p>
+
+<button id="upgrade4">
+
+Buy ($1000)
+
+</button>
+
+</div>
+
+</section>
+
+<section id="stats" class="hidden">
+
+<h2>Statistics</h2>
+
+<p>Total Pumps:</p>
+
+<h3 id="totalPumps">
+
+0
+
+</h3>
+
+<p>Money Earned:</p>
+
+<h3>
+
+$<span id="moneyEarned">
+
+0
+
+</span>
+
+</h3>
+
+<p>Level</p>
+
+<h3 id="level">
+
+1
+
+</h3>
+
+</section>
+
+<section id="settings" class="hidden">
+
+<h2>Settings</h2>
+
+<button id="resetSave">
+
+Reset Save
+
+</button>
+
+<button id="muteMusic">
+
+Mute Music
+
+</button>
+
+</section>
+
+</main>
+
+<footer>
+
+<p>
+
+© 2026 SackDrainers
+
+</p>
+
+<p>
+
+Made By Nyn
+
+</p>
+
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
