@@ -3,116 +3,69 @@
 <head>
     <title>Sack Drainers</title>
     <style>
-        body { margin: 0; background: #1a1a1a; color: #fff; text-align: center; font-family: 'Arial', sans-serif; }
-        canvas { background: #f0f0f0; display: block; margin: 10px auto; border: 8px solid #333; }
-        .menu { padding: 20px; }
-        button { padding: 15px 30px; margin: 10px; font-size: 18px; cursor: pointer; background: #444; color: white; border: none; }
+        body { margin: 0; background: #222; color: #fff; font-family: 'Arial', sans-serif; text-align: center; }
+        #game-container { position: relative; width: 800px; height: 600px; margin: 20px auto; border: 4px solid #fff; background: #3a3a3a; }
+        .ui-box { position: absolute; border: 3px solid #666; padding: 10px; background: rgba(0,0,0,0.7); }
+        #inventory { top: 20px; left: 20px; width: 150px; }
+        #score-map { bottom: 20px; left: 20px; width: 200px; height: 100px; }
+        #level-info { top: 20px; right: 20px; width: 200px; }
+        button { cursor: pointer; padding: 10px; margin-top: 5px; }
     </style>
 </head>
 <body>
-    <div id="gameUI">
-        <h1>Sack Drainers</h1>
-        <div id="menu" class="menu">
-            <h3>Select Location:</h3>
-            <button onclick="startGame(0)">Public Restroom</button>
-            <button onclick="startGame(1)">Gas Station</button>
-            <button onclick="startGame(2)">Luxury Hotel</button>
+
+    <div id="game-container">
+        <!-- Start Screen -->
+        <div id="intro-screen">
+            <h1>SACK DRAINERS</h1>
+            <p>Select your starting contract:</p>
+            <button onclick="startGame(0)">Gas Station Restroom</button>
+            <button onclick="startGame(1)">Random Home</button>
+            <button onclick="startGame(2)">President's House</button>
         </div>
-        <div id="gameBoard" style="display:none;">
-            <div id="ui">Money: $<span id="money">0</span> | Location: <span id="loc"></span></div>
-            <canvas id="gameCanvas" width="800" height="400"></canvas>
-            <button onclick="location.reload()">Exit to Menu</button>
+
+        <!-- Game Interface -->
+        <div id="game-board" style="display:none;">
+            <div id="inventory" class="ui-box">Inventory: [ Plunger ]</div>
+            <div id="level-info" class="ui-box">Location: <span id="loc-name"></span><br>Goal: Collect $50</div>
+            <div id="score-map" class="ui-box">Map Progress: <span id="progress">0%</span></div>
+            
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
         </div>
     </div>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-        
-        let game = { active: false, money: 0, level: 0, 
-            locations: ["Public Restroom", "Gas Station", "Luxury Hotel"],
-            bgColors: ["#dcdcdc", "#fffacd", "#ffd700"] 
-        };
+        const locations = ["Gas Station", "Random Home", "President's House"];
+        let gameState = { money: 0, level: 0, active: false };
 
-        let player = { x: 100, y: 250 };
+        function startGame(level) {
+            gameState.level = level;
+            document.getElementById("intro-screen").style.display = "none";
+            document.getElementById("game-board").style.display = "block";
+            document.getElementById("loc-name").innerText = locations[level];
+            gameState.active = true;
+            gameLoop();
+        }
 
-        function drawCharacter() {
-            ctx.strokeStyle = "#000";
-            ctx.lineWidth = 5;
-            ctx.lineCap = "round";
-
-            // Arms
-            ctx.beginPath();
-            ctx.moveTo(player.x, player.y + 50);
-            ctx.lineTo(player.x - 20, player.y + 80); // Left Arm
-            ctx.moveTo(player.x + 30, player.y + 50);
-            ctx.lineTo(player.x + 50, player.y + 80); // Right Arm
-            ctx.stroke();
-
-            // Legs
-            ctx.beginPath();
-            ctx.moveTo(player.x + 5, player.y + 100);
-            ctx.lineTo(player.x - 10, player.y + 150); // Left Leg
-            ctx.moveTo(player.x + 25, player.y + 100);
-            ctx.lineTo(player.x + 40, player.y + 150); // Right Leg
-            ctx.stroke();
-
-            // Torso
-            ctx.fillStyle = "#fff"; // Shirt
-            ctx.fillRect(player.x, player.y + 40, 30, 60);
-
-            // Head & Durag
-            ctx.fillStyle = "#6b4423"; // Skin
-            ctx.beginPath();
-            ctx.arc(player.x + 15, player.y + 20, 15, 0, Math.PI * 2);
-            ctx.fill();
+        function gameLoop() {
+            if (!gameState.active) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            ctx.fillStyle = "black"; // Durag
-            ctx.fillRect(player.x, player.y + 5, 30, 10);
-            ctx.fillRect(player.x - 5, player.y + 10, 40, 5); // Wrap
-        }
-
-        function drawToilet() {
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(600, 310, 60, 50);
-            ctx.fillStyle = "#eee";
-            ctx.fillRect(610, 280, 40, 30);
-        }
-
-        function startGame(levelIndex) {
-            game.level = levelIndex;
-            game.money = 0;
-            player.x = 100;
-            document.getElementById("menu").style.display = "none";
-            document.getElementById("gameBoard").style.display = "block";
-            document.getElementById("loc").innerText = game.locations[game.level];
-            game.active = true;
-            animate();
-        }
-
-        function animate() {
-            if (!game.active) return;
-            ctx.fillStyle = game.bgColors[game.level];
-            ctx.fillRect(0, 0, 800, 400);
+            // Draw Character Placeholder
+            ctx.fillStyle = "#8B4513";
+            ctx.fillRect(350, 300, 50, 100); // Simple body
             
-            drawToilet();
-            drawCharacter();
-            requestAnimationFrame(animate);
+            requestAnimationFrame(gameLoop);
         }
 
+        // Logic for collecting money
         window.addEventListener("keydown", (e) => {
-            if (!game.active) return;
-            if (e.key === "ArrowRight") player.x += 20;
-            if (e.key === "ArrowLeft") player.x -= 20;
-            if (e.key === " " && Math.abs(player.x - 550) < 50) {
-                game.money += 10;
-                document.getElementById("money").innerText = game.money;
-                if (game.money >= 40) {
-                    game.level = (game.level + 1) % game.locations.length;
-                    game.money = 0;
-                    player.x = 100;
-                    document.getElementById("loc").innerText = game.locations[game.level];
-                }
+            if (e.key === " ") {
+                gameState.money += 10;
+                document.getElementById("progress").innerText = (gameState.money * 2) + "%";
+                if (gameState.money >= 50) alert("Contract Complete!");
             }
         });
     </script>
