@@ -1,49 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sack Drainers</title>
+    <title>Sack Drainers: Pro Edition</title>
     <style>
-        body { margin: 0; background: #333; color: white; text-align: center; font-family: sans-serif; }
-        canvas { background: #eee; display: block; margin: 20px auto; border: 5px solid #555; }
+        body { margin: 0; background: #222; color: #fff; text-align: center; font-family: 'Courier New', Courier, monospace; }
+        canvas { background: #dcdcdc; display: block; margin: 10px auto; border: 8px solid #444; }
+        #ui { font-size: 24px; margin: 10px; }
     </style>
 </head>
 <body>
     <h1>Sack Drainers</h1>
-    <p>Use Left/Right arrows to move. Press Space to pump the toilet!</p>
-    <h2 id="money">Money: $0</h2>
+    <div id="ui">Money: $<span id="money">0</span> | Location: <span id="loc">Public Restroom</span></div>
     <canvas id="gameCanvas" width="800" height="400"></canvas>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-        let money = 0;
-        let player = { x: 50, y: 300, width: 40, height: 60 };
-        let toilet = { x: 600, y: 320, width: 80, height: 50 };
+
+        let game = {
+            money: 0,
+            level: 0,
+            locations: ["Public Restroom", "Gas Station", "Luxury Hotel", "Abandoned Warehouse"],
+            colors: ["#add8e6", "#ffffe0", "#ffd700", "#a9a9a9"]
+        };
+
+        let player = { x: 50, y: 280, width: 40, height: 80 };
+        let toilet = { x: 600, y: 310, width: 60, height: 60 };
 
         function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Update background color based on level
+            canvas.style.backgroundColor = game.colors[game.level % game.colors.length];
             
-            // Draw Player (Durag character represented as a blue box)
-            ctx.fillStyle = "blue";
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Character (Simplified Detail)
+            ctx.fillStyle = "#8B4513"; // Skin tone
             ctx.fillRect(player.x, player.y, player.width, player.height);
-            ctx.fillStyle = "black";
-            ctx.fillRect(player.x, player.y, player.width, 10); // Durag representation
+            ctx.fillStyle = "black"; // Durag
+            ctx.fillRect(player.x, player.y, player.width, 15);
+            ctx.fillStyle = "white"; // Shirt
+            ctx.fillRect(player.x, player.y + 15, player.width, 30);
 
             // Draw Toilet
-            ctx.fillStyle = "white";
+            ctx.fillStyle = "#fff";
             ctx.fillRect(toilet.x, toilet.y, toilet.width, toilet.height);
-            ctx.fillStyle = "grey";
-            ctx.fillRect(toilet.x + 20, toilet.y - 20, 40, 20); // Tank
+            ctx.fillStyle = "#ccc";
+            ctx.fillRect(toilet.x + 10, toilet.y - 15, 40, 15);
 
             requestAnimationFrame(draw);
         }
 
         window.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowRight") player.x += 20;
-            if (e.key === "ArrowLeft") player.x -= 20;
+            if (e.key === "ArrowRight" && player.x < 750) player.x += 20;
+            if (e.key === "ArrowLeft" && player.x > 0) player.x -= 20;
+            
             if (e.key === " " && Math.abs(player.x - toilet.x) < 50) {
-                money += 10;
-                document.getElementById("money").innerText = "Money: $" + money;
+                game.money += 10;
+                document.getElementById("money").innerText = game.money;
+
+                // Check for level switch
+                if (game.money >= 40) {
+                    game.money = 0;
+                    game.level++;
+                    document.getElementById("money").innerText = "0";
+                    document.getElementById("loc").innerText = game.locations[game.level % game.locations.length];
+                    alert("Moved to new location: " + game.locations[game.level % game.locations.length]);
+                }
             }
         });
 
