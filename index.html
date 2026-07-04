@@ -7,7 +7,6 @@
         canvas { background: #f0f0f0; display: block; margin: 10px auto; border: 8px solid #333; }
         .menu { padding: 20px; }
         button { padding: 15px 30px; margin: 10px; font-size: 18px; cursor: pointer; background: #444; color: white; border: none; }
-        button:hover { background: #666; }
     </style>
 </head>
 <body>
@@ -35,52 +34,55 @@
             bgColors: ["#dcdcdc", "#fffacd", "#ffd700"] 
         };
 
-        let player = { x: 50, y: 250, width: 40, height: 100 };
-
-        function drawBackground() {
-            // Draw floor tiles
-            ctx.fillStyle = "#ccc";
-            for(let i=0; i<800; i+=50) {
-                for(let j=300; j<400; j+=50) {
-                    ctx.strokeRect(i, j, 50, 50);
-                }
-            }
-            // Draw a wall line
-            ctx.fillStyle = "#888";
-            ctx.fillRect(0, 300, 800, 10);
-        }
+        let player = { x: 100, y: 250 };
 
         function drawCharacter() {
-            // Body
-            ctx.fillStyle = "#4a2c2a"; 
-            ctx.fillRect(player.x, player.y + 20, player.width, 80);
-            // Head
-            ctx.fillStyle = "#6b4423";
-            ctx.fillRect(player.x + 5, player.y, 30, 30);
-            // Durag (with tail)
-            ctx.fillStyle = "black";
-            ctx.fillRect(player.x + 5, player.y, 30, 8); // Top
-            ctx.fillRect(player.x - 5, player.y + 5, 45, 8); // Wrap
-            ctx.fillRect(player.x - 10, player.y + 10, 10, 20); // Tail
+            ctx.strokeStyle = "#000";
+            ctx.lineWidth = 5;
+            ctx.lineCap = "round";
+
+            // Arms
+            ctx.beginPath();
+            ctx.moveTo(player.x, player.y + 50);
+            ctx.lineTo(player.x - 20, player.y + 80); // Left Arm
+            ctx.moveTo(player.x + 30, player.y + 50);
+            ctx.lineTo(player.x + 50, player.y + 80); // Right Arm
+            ctx.stroke();
+
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(player.x + 5, player.y + 100);
+            ctx.lineTo(player.x - 10, player.y + 150); // Left Leg
+            ctx.moveTo(player.x + 25, player.y + 100);
+            ctx.lineTo(player.x + 40, player.y + 150); // Right Leg
+            ctx.stroke();
+
+            // Torso
+            ctx.fillStyle = "#fff"; // Shirt
+            ctx.fillRect(player.x, player.y + 40, 30, 60);
+
+            // Head & Durag
+            ctx.fillStyle = "#6b4423"; // Skin
+            ctx.beginPath();
+            ctx.arc(player.x + 15, player.y + 20, 15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = "black"; // Durag
+            ctx.fillRect(player.x, player.y + 5, 30, 10);
+            ctx.fillRect(player.x - 5, player.y + 10, 40, 5); // Wrap
         }
 
         function drawToilet() {
-            // Base
             ctx.fillStyle = "#fff";
             ctx.fillRect(600, 310, 60, 50);
-            // Tank
             ctx.fillStyle = "#eee";
             ctx.fillRect(610, 280, 40, 30);
-            // Seat
-            ctx.strokeStyle = "#999";
-            ctx.lineWidth = 5;
-            ctx.strokeRect(600, 310, 60, 20);
         }
 
         function startGame(levelIndex) {
             game.level = levelIndex;
             game.money = 0;
-            player.x = 50;
+            player.x = 100;
             document.getElementById("menu").style.display = "none";
             document.getElementById("gameBoard").style.display = "block";
             document.getElementById("loc").innerText = game.locations[game.level];
@@ -93,7 +95,6 @@
             ctx.fillStyle = game.bgColors[game.level];
             ctx.fillRect(0, 0, 800, 400);
             
-            drawBackground();
             drawToilet();
             drawCharacter();
             requestAnimationFrame(animate);
@@ -101,17 +102,16 @@
 
         window.addEventListener("keydown", (e) => {
             if (!game.active) return;
-            if (e.key === "ArrowRight" && player.x < 750) player.x += 20;
-            if (e.key === "ArrowLeft" && player.x > 0) player.x -= 20;
+            if (e.key === "ArrowRight") player.x += 20;
+            if (e.key === "ArrowLeft") player.x -= 20;
             if (e.key === " " && Math.abs(player.x - 550) < 50) {
                 game.money += 10;
                 document.getElementById("money").innerText = game.money;
                 if (game.money >= 40) {
                     game.level = (game.level + 1) % game.locations.length;
                     game.money = 0;
-                    player.x = 50;
+                    player.x = 100;
                     document.getElementById("loc").innerText = game.locations[game.level];
-                    alert("Next Location!");
                 }
             }
         });
