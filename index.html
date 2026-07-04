@@ -1,83 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
-        #gameUI { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        canvas { display: block; }
-        #intro { position: absolute; top: 30%; left: 35%; color: white; text-align: center; pointer-events: auto; }
-        button { padding: 15px 30px; font-size: 20px; background: #ff4500; color: white; border: none; cursor: pointer; border-radius: 10px; }
+        body { margin: 0; background: #222; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        canvas { border: 5px solid #fff; background-color: #dcdcdc; }
     </style>
 </head>
 <body>
 
-    <div id="intro">
-        <h1>SACK DRAINERS</h1>
-        <button onclick="initGame()">GAME ON</button>
-    </div>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
 
-    <canvas id="gc"></canvas>
+<script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
 
-    <script>
-        const canvas = document.getElementById("gc");
-        const ctx = canvas.getContext("2d");
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+    // Game Objects
+    let player = { x: 100, y: 350, speed: 15, holdingPlunger: true };
+    let game = { money: 0, level: 0, locations: ["Gas Station", "Random Home", "President's House"] };
 
-        let game = {
-            level: 0,
-            money: 0,
-            inventory: ['Plunger'],
-            player: { x: 100, y: 300, frame: 0 },
-            locations: ["Gas Station", "Random Home", "President's House"]
-        };
+    // Function to draw the high-detail scene
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        function drawCharacter(x, y) {
-            // Legs/Walking animation simulation
-            ctx.fillStyle = "#8B4513";
-            ctx.fillRect(x, y + 50, 20, 60); // Body
-            ctx.fillStyle = "black";
-            ctx.fillRect(x - 5, y, 30, 20); // Durag
-            ctx.fillStyle = "#ff4500";
-            ctx.fillRect(x + 5, y + 60, 10, 20); // Plunger
+        // 1. Draw Bathroom Background (Detailed)
+        ctx.fillStyle = "#a0a0a0"; // Floor
+        ctx.fillRect(0, 450, 800, 150);
+        ctx.strokeStyle = "#777";
+        ctx.strokeRect(0, 450, 800, 150);
+
+        // 2. Draw Toilet (Detailed)
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.ellipse(650, 500, 50, 40, 0, 0, Math.PI * 2);
+        ctx.fill(); // Toilet Base
+        ctx.fillRect(630, 420, 40, 60); // Tank
+
+        // 3. Draw Character (Detailed with Plunger)
+        ctx.fillStyle = "#5d4037"; // Skin
+        ctx.fillRect(player.x, player.y, 50, 100); 
+        ctx.fillStyle = "black"; // Durag
+        ctx.fillRect(player.x - 5, player.y - 10, 60, 20);
+        
+        // Holding Plunger
+        if (player.holdingPlunger) {
+            ctx.strokeStyle = "#8b4513"; ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(player.x + 40, player.y + 50);
+            ctx.lineTo(player.x + 80, player.y + 20);
+            ctx.stroke();
+            ctx.fillStyle = "red";
+            ctx.beginPath();
+            ctx.arc(player.x + 80, player.y + 20, 15, 0, Math.PI * 2);
+            ctx.fill(); // Plunger head
         }
 
-        function initGame() {
-            document.getElementById("intro").style.display = "none";
-            loop();
-        }
+        // 4. UI Layer (Inventory & Money)
+        ctx.fillStyle = "rgba(0,0,0,0.7)";
+        ctx.fillRect(10, 10, 200, 80);
+        ctx.fillStyle = "white";
+        ctx.fillText("INVENTORY: [Plunger]", 20, 40);
+        ctx.fillText("MONEY: $" + game.money, 20, 70);
+        ctx.fillText("LOCATION: " + game.locations[game.level], 20, 90);
+    }
 
-        function loop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw Environment (Simplified based on image_aef428.jpg)
-            ctx.fillStyle = "#a9a9a9";
-            ctx.fillRect(0, 400, canvas.width, 200); // Floor
-            
-            drawCharacter(game.player.x, game.player.y);
-            
-            // UI Overlay
-            ctx.fillStyle = "white";
-            ctx.font = "20px Arial";
-            ctx.fillText("Inventory: " + game.inventory.join(', '), 20, 30);
-            ctx.fillText("Location: " + game.locations[game.level], 20, 60);
-            ctx.fillText("Money: $" + game.money, 20, 90);
-
-            requestAnimationFrame(loop);
-        }
-
-        window.addEventListener('keydown', (e) => {
-            if(e.key === 'ArrowRight') game.player.x += 10;
-            if(e.key === 'ArrowLeft') game.player.x -= 10;
-            if(e.key === ' ') {
-                game.money += 10;
-                if(game.money >= 50) {
-                    game.level = (game.level + 1) % game.locations.length;
-                    game.money = 0;
-                    game.player.x = 100;
-                }
+    // Movement Logic
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight") player.x += player.speed;
+        if (e.key === "ArrowLeft") player.x -= player.speed;
+        if (e.key === " " && player.x > 550) {
+            game.money += 10;
+            if (game.money >= 50) {
+                game.level++;
+                game.money = 0;
+                player.x = 100;
+                alert("You moved to: " + game.locations[game.level]);
             }
-        });
-    </script>
+        }
+        draw();
+    });
+
+    draw();
+</script>
 </body>
 </html>
