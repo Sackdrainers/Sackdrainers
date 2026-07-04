@@ -3,15 +3,16 @@
 <head>
     <title>Sack Drainers</title>
     <style>
-        body { margin: 0; background: #222; color: #fff; text-align: center; font-family: 'Arial', sans-serif; }
-        canvas { background: #dcdcdc; display: block; margin: 10px auto; border: 8px solid #444; cursor: pointer; }
-        .menu { display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        button { padding: 15px 30px; margin: 10px; font-size: 18px; cursor: pointer; }
+        body { margin: 0; background: #1a1a1a; color: #fff; text-align: center; font-family: 'Arial', sans-serif; }
+        canvas { background: #f0f0f0; display: block; margin: 10px auto; border: 8px solid #333; }
+        .menu { padding: 20px; }
+        button { padding: 15px 30px; margin: 10px; font-size: 18px; cursor: pointer; background: #444; color: white; border: none; }
+        button:hover { background: #666; }
     </style>
 </head>
 <body>
     <div id="gameUI">
-        <h1 id="title">Sack Drainers</h1>
+        <h1>Sack Drainers</h1>
         <div id="menu" class="menu">
             <h3>Select Location:</h3>
             <button onclick="startGame(0)">Public Restroom</button>
@@ -21,7 +22,7 @@
         <div id="gameBoard" style="display:none;">
             <div id="ui">Money: $<span id="money">0</span> | Location: <span id="loc"></span></div>
             <canvas id="gameCanvas" width="800" height="400"></canvas>
-            <button onclick="location.reload()">Back to Menu</button>
+            <button onclick="location.reload()">Exit to Menu</button>
         </div>
     </div>
 
@@ -29,66 +30,88 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         
-        let game = {
-            active: false,
-            money: 0,
-            level: 0,
+        let game = { active: false, money: 0, level: 0, 
             locations: ["Public Restroom", "Gas Station", "Luxury Hotel"],
-            colors: ["#add8e6", "#ffffe0", "#ffd700"]
+            bgColors: ["#dcdcdc", "#fffacd", "#ffd700"] 
         };
 
-        let player = { x: 50, y: 280, width: 40, height: 80 };
-        let toilet = { x: 600, y: 310, width: 60, height: 60 };
+        let player = { x: 50, y: 250, width: 40, height: 100 };
+
+        function drawBackground() {
+            // Draw floor tiles
+            ctx.fillStyle = "#ccc";
+            for(let i=0; i<800; i+=50) {
+                for(let j=300; j<400; j+=50) {
+                    ctx.strokeRect(i, j, 50, 50);
+                }
+            }
+            // Draw a wall line
+            ctx.fillStyle = "#888";
+            ctx.fillRect(0, 300, 800, 10);
+        }
+
+        function drawCharacter() {
+            // Body
+            ctx.fillStyle = "#4a2c2a"; 
+            ctx.fillRect(player.x, player.y + 20, player.width, 80);
+            // Head
+            ctx.fillStyle = "#6b4423";
+            ctx.fillRect(player.x + 5, player.y, 30, 30);
+            // Durag (with tail)
+            ctx.fillStyle = "black";
+            ctx.fillRect(player.x + 5, player.y, 30, 8); // Top
+            ctx.fillRect(player.x - 5, player.y + 5, 45, 8); // Wrap
+            ctx.fillRect(player.x - 10, player.y + 10, 10, 20); // Tail
+        }
+
+        function drawToilet() {
+            // Base
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(600, 310, 60, 50);
+            // Tank
+            ctx.fillStyle = "#eee";
+            ctx.fillRect(610, 280, 40, 30);
+            // Seat
+            ctx.strokeStyle = "#999";
+            ctx.lineWidth = 5;
+            ctx.strokeRect(600, 310, 60, 20);
+        }
 
         function startGame(levelIndex) {
             game.level = levelIndex;
             game.money = 0;
-            player.x = 50; // Spawn at entrance
+            player.x = 50;
             document.getElementById("menu").style.display = "none";
             document.getElementById("gameBoard").style.display = "block";
             document.getElementById("loc").innerText = game.locations[game.level];
             game.active = true;
-            draw();
+            animate();
         }
 
-        function draw() {
+        function animate() {
             if (!game.active) return;
-            canvas.style.backgroundColor = game.colors[game.level];
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw Character (Detailed)
-            ctx.fillStyle = "#8B4513"; // Skin
-            ctx.fillRect(player.x, player.y + 15, player.width, 65);
-            ctx.fillStyle = "black"; // Durag
-            ctx.fillRect(player.x - 5, player.y, player.width + 10, 20);
-            ctx.fillStyle = "white"; // Shirt
-            ctx.fillRect(player.x, player.y + 20, player.width, 30);
-
-            // Draw Toilet
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(toilet.x, toilet.y, toilet.width, toilet.height);
-            ctx.fillStyle = "#aaa";
-            ctx.fillRect(toilet.x + 10, toilet.y - 15, 40, 15);
-
-            requestAnimationFrame(draw);
+            ctx.fillStyle = game.bgColors[game.level];
+            ctx.fillRect(0, 0, 800, 400);
+            
+            drawBackground();
+            drawToilet();
+            drawCharacter();
+            requestAnimationFrame(animate);
         }
 
         window.addEventListener("keydown", (e) => {
             if (!game.active) return;
             if (e.key === "ArrowRight" && player.x < 750) player.x += 20;
             if (e.key === "ArrowLeft" && player.x > 0) player.x -= 20;
-            
-            if (e.key === " " && Math.abs(player.x - toilet.x) < 50) {
+            if (e.key === " " && Math.abs(player.x - 550) < 50) {
                 game.money += 10;
                 document.getElementById("money").innerText = game.money;
-
                 if (game.money >= 40) {
                     game.level = (game.level + 1) % game.locations.length;
                     game.money = 0;
-                    player.x = 50; // Reset to entrance
-                    document.getElementById("money").innerText = "0";
+                    player.x = 50;
                     document.getElementById("loc").innerText = game.locations[game.level];
-                    alert("Moved to: " + game.locations[game.level]);
+                    alert("Next Location!");
                 }
             }
         });
